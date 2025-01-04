@@ -1,0 +1,4 @@
+<entity-facade-xml>
+    <MoquiTraining trainingId="1" trainingName="Java Basics"
+                   trainingDate="2025-01-10" trainingPrice="499.99" trainingDuration="40"/>
+</entity-facade-xml>

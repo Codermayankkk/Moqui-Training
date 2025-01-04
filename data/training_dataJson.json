@@ -1,0 +1,19 @@
+[
+  {"_dataType": "demo" },
+  {
+    "_entity": "moquiExample",
+    "trainingId": 1,
+    "trainingName": "Moqui Basics",
+    "trainingDate": "2025-01-10",
+    "trainingPrice": 499.99,
+    "trainingDuration": 40
+  },
+  {
+    "_entity": "moquiExample",
+    "trainingId": 2,
+    "trainingName": "python Basics",
+    "trainingDate": "2025-01-11",
+    "trainingPrice": 399.99,
+    "trainingDuration": 20
+  }
+]
