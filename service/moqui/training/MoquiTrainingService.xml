@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+<!--    Service through entity-auto-->
+<!--          <service verb="create" noun="MoquiTraining" type="entity-auto">-->
+<!--            <in-parameters>-->
+<!--                <auto-parameters entity-name="moqui.training.MoquiTraining" include="nonpk"/>-->
+<!--                <parameter name="trainingName" required="true">-->
+<!--                    <matches regexp="^[A-Za-z]+$" message="Please enter valid Text"/></parameter>-->
+<!--                <parameter name="trainingDate" required="true"/>-->
+<!--            </in-parameters>-->
+<!--            <out-parameters>-->
+<!--                <auto-parameters include="pk" required="true"/>-->
+<!--            </out-parameters>-->
+<!--          </service>-->
+
+<!--     Service through inline-->
+<!--        <service verb="create" noun="MoquiTraining">-->
+<!--            <in-parameters>-->
+<!--                <auto-parameters entity-name="moqui.training.MoquiTraining" include="nonpk"/>-->
+<!--                <parameter name="trainingName" required="true"/>-->
+<!--                <parameter name="trainingDate" required="true"/>-->
+<!--            </in-parameters>-->
+<!--            <out-parameters>-->
+<!--                <parameter name="trainingId" type="id"/>-->
+<!--            </out-parameters>-->
+<!--            <actions>-->
+<!--                <service-call name="create#moqui.training.MoquiTraining" in-map="context" out-map="context"/>-->
+<!--            </actions>-->
+<!--        </service>-->
+<!--       -->
+<!--    service through script-->
+        <service verb="create" noun="MoquiTraining" type="script" location="component://Moqui-Training/scripts/GroovyService.groovy">
+            <in-parameters>
+                <auto-parameters entity-name="moqui.training.MoquiTraining" include="nonpk"/>
+                <parameter name="trainingName" required="true"/>
+                <parameter name="trainingDate" required="true"/>
+            </in-parameters>
+            <out-parameters>
+                <parameter name="trainingId" type="id"/>
+            </out-parameters>
+        </service>
+
+        <service verb="find" noun="MoquiTraining">
+            <in-parameters>
+                <parameter name="trainingName" entity-name="moqui.training.MoquiTraining"/>
+                <parameter name="trainingId" entity-name="moqui.training.MoquiTraining"/>
+            </in-parameters>
+            <out-parameters>
+                <parameter name="trainingList" required="true"/>
+            </out-parameters>
+            <actions>
+                <entity-find entity-name="moqui.training.MoquiTraining" list="trainingList">
+                    <econdition field-name="trainingName" ignore-if-empty="true"/>
+                    <econdition field-name="trainingId" ignore-if-empty="true"/>
+                    <select-field field-name="trainingId"/>
+                    <select-field field-name="trainingName"/>
+                    <select-field field-name="trainingDate"/>
+                    <select-field field-name="trainingPrice"/>
+                    <select-field field-name="trainingDuration"/>
+                </entity-find>
+            </actions>
+        </service>
+
+    <service verb="store" noun="MoquiTraining">
+        <in-parameters>
+            <parameter name="trainingId"/>
+            <parameter name="trainingName" required="true"/>
+            <parameter name="trainingDate" required="true"/>
+            <parameter name="trainingPrice"/>
+            <parameter name="trainingDuration"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="trainingId"/>
+        </out-parameters>
+        <actions>
+            <script>
+                <![CDATA[ // Fetch existing record by trainingId or trainingName
+                 def trainingRecord = ec.entity.find("moqui.training.MoquiTraining")
+                 if(context.trainingId)
+                 {
+                 trainingRecord.condition("trainingId", context.trainingId)
+                 }
+                 else if(context.trainingName)
+                 {
+                  trainingRecord.condition("trainingName", context.trainingName)
+                 }
+                 trainingRecord = trainingRecord.one()
+                 if(trainingRecord)
+                 {
+                  // Update existing record trainingRecord.set("trainingDate", context.trainingDate)
+                  trainingRecord.set("trainingPrice", context.trainingPrice)
+                  trainingRecord.set("trainingDuration", context.trainingDuration)
+                  trainingRecord.update()
+                  context.trainingId = trainingRecord.trainingId
+                 }
+                 else
+                 {
+                  // Create a new record def newTrainingId = ec.entity.sequencedIdPrimary("moqui.training.MoquiTraining", null, null)
+                   ec.entity.makeValue("moqui.training.MoquiTraining")
+                   .set("trainingId", newTrainingId)
+                   .set("trainingName", context.trainingName)
+                   .set("trainingDate", context.trainingDate)
+                   .set("trainingPrice", context.trainingPrice)
+                   .set("trainingDuration", context.trainingDuration)
+                   .create()
+                   context.trainingId = newTrainingId
+                 }
+               ]]>
+            </script>
+        </actions>
+    </service>
+</services>

@@ -1,5 +1,3 @@
-<!--<?xml version="1.0" encoding="UTF-8" ?>-->
-<component name="MoquiTraining" version="1.0.0">
-<!--    <description></description>-->
-<!--    <runtime></runtime>-->
+<?xml version="1.0" encoding="UTF-8" ?>
+<component name="Moqui-Training" version="1.0.0">
 </component>
