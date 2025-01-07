@@ -63,7 +63,7 @@
 
     <service verb="store" noun="MoquiTraining">
         <in-parameters>
-            <parameter name="trainingId"/>
+            <parameter name="trainingId" required="true"/>
             <parameter name="trainingName" required="true"/>
             <parameter name="trainingDate" required="true"/>
             <parameter name="trainingPrice"/>
@@ -97,7 +97,7 @@
                  {
                   // Create a new record def newTrainingId = ec.entity.sequencedIdPrimary("moqui.training.MoquiTraining", null, null)
                    ec.entity.makeValue("moqui.training.MoquiTraining")
-                   .set("trainingId", newTrainingId)
+                   .set("trainingId", TrainingId)
                    .set("trainingName", context.trainingName)
                    .set("trainingDate", context.trainingDate)
                    .set("trainingPrice", context.trainingPrice)
