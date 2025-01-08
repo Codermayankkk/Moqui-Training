@@ -49,6 +49,8 @@
                 <parameter name="trainingList" required="true"/>
             </out-parameters>
             <actions>
+                <log message="=======${trainingName}========="/>
+                <log message="===========${trainingId}============="/>
                 <entity-find entity-name="moqui.training.MoquiTraining" list="trainingList">
                     <econdition field-name="trainingName" ignore-if-empty="true"/>
                     <econdition field-name="trainingId" ignore-if-empty="true"/>
@@ -58,6 +60,7 @@
                     <select-field field-name="trainingPrice"/>
                     <select-field field-name="trainingDuration"/>
                 </entity-find>
+                <log level="info" message="====== list: ${trainingList}"/>
             </actions>
         </service>
 
@@ -88,6 +91,8 @@
                  if(trainingRecord)
                  {
                   // Update existing record trainingRecord.set("trainingDate", context.trainingDate)
+                  trainingRecord.set("trainingName", context.trainingName)
+                  trainingRecord.set("trainingDate", context.trainingDate)
                   trainingRecord.set("trainingPrice", context.trainingPrice)
                   trainingRecord.set("trainingDuration", context.trainingDuration)
                   trainingRecord.update()
@@ -109,4 +114,31 @@
             </script>
         </actions>
     </service>
+
+        <service verb="delete" noun="MoquiTraining">
+            <in-parameters>
+                <parameter name="trainingId" required="true">
+                </parameter>
+            </in-parameters>
+            <out-parameters>
+                <parameter name="message">
+                    <description>Result message</description>
+                </parameter>
+            </out-parameters>
+            <actions>
+                <entity-find-one entity-name="moquiExample" value-field="filterdata">
+                    <field-map field-name="trainingId" from="context.trainingId"/>
+                </entity-find-one>
+
+                <if condition="filterdata != null">
+                   <then>
+                       <entity-delete value-field="filterdata"/>
+                       <set field="message" value="Training Id ${trainingId} deleted successfully"/>
+                   </then>
+                    <else>
+                        <set field="message" value="Please enter valid training Id this id is not present in Database"/>
+                    </else>
+                </if>
+            </actions>
+        </service>
 </services>

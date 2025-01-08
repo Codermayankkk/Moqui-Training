@@ -4,11 +4,33 @@
               name="MoquiTraining" displayName="MoquiTraining REST API" version="2.0.0">
 
     <resource name="moquiTrainingGet" require-authentication="anonymous-all">
-       <method type="get"><entity name="moquiExample" operation="list"/></method>
+       <method type="get">
+           <service name="moqui.training.MoquiTrainingService.find#MoquiTraining"/>
+       </method>
+        <id name="trainingId" >
+          <method type="get">
+              <entity name="moquiExample" operation="one"/>
+          </method>
+        </id>
     </resource>
 
     <resource name="moquiTrainingPost" require-authentication="anonymous-all">
-        <method type="post"><service name="moqui.training.MoquiTrainingService.create#MoquiTraining"/></method>
+        <method type="post">
+            <service name="moqui.training.MoquiTrainingService.create#MoquiTraining"/>
+        </method>
     </resource>
     
+    <resource name="moquiTrainingPut" require-authentication="anonymous-all">
+        <method type="put">
+            <service name="moqui.training.MoquiTrainingService.store#MoquiTraining"/>
+        </method>
+    </resource>
+
+    <resource name="moquiTrainingDelete" require-authentication="anonymous-all">
+      <id name="trainingId">
+        <method type="delete">
+            <service name="moqui.training.MoquiTrainingService.delete#MoquiTraining"/>
+        </method>
+      </id>
+    </resource>
 </resource>
