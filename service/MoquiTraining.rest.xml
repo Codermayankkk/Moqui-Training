@@ -5,7 +5,7 @@
 
     <resource name="moquiTrainingGet" require-authentication="anonymous-all">
        <method type="get">
-           <service name="moqui.training.MoquiTrainingService.find#MoquiTraining"/>
+           <service name="moqui.training.MoquiTrainingService.find#MoquiTrainingFind"/>
        </method>
         <id name="trainingId" >
           <method type="get">
@@ -16,20 +16,20 @@
 
     <resource name="moquiTrainingPost" require-authentication="anonymous-all">
         <method type="post">
-            <service name="moqui.training.MoquiTrainingService.create#MoquiTraining"/>
+            <service name="moqui.training.MoquiTrainingService.create#MoquiTrainingCreate"/>
         </method>
     </resource>
     
     <resource name="moquiTrainingPut" require-authentication="anonymous-all">
         <method type="put">
-            <service name="moqui.training.MoquiTrainingService.store#MoquiTraining"/>
+            <service name="moqui.training.MoquiTrainingService.store#MoquiTrainingCreateOrUpdate"/>
         </method>
     </resource>
 
     <resource name="moquiTrainingDelete" require-authentication="anonymous-all">
       <id name="trainingId">
         <method type="delete">
-            <service name="moqui.training.MoquiTrainingService.delete#MoquiTraining"/>
+            <service name="moqui.training.MoquiTrainingService.delete#MoquiTrainingDelete"/>
         </method>
       </id>
     </resource>

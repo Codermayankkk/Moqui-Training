@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+
+    <service verb="create" noun="Party" type="entity-auto">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <auto-parameters entity-name="partyAlias" include="nonpk"/>
+            <parameter name="partyType" required="true"/>
+            <parameter name="firstName" required="true">
+                <matches regexp="^[A-Za-z]+$" message="Only characters are allowed"/>
+            </parameter>
+            <parameter name="lastName">
+                <matches regexp="^[A-Za-z]+$" message="Only characters are allowed"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <auto-parameters include="pk" required="true"/>
+        </out-parameters>
+    </service>
+
+    <service verb="find" noun="PartyFind">
+        <in-parameters>
+            <parameter name="partyId" entity-name="partyAlias"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyList" required="true"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="partyAlias" list="partyList">
+                <econdition field-name="partyId" ignore-if-empty="true"/>
+                <select-field field-name="partyId"/>
+                <select-field field-name="partyType"/>
+                <select-field field-name="firstName"/>
+                <select-field field-name="lastName"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <service verb="store" noun="PartyCreateOrUpdate">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="partyType" required="true"/>
+            <parameter name="firstName"/>
+            <parameter name="lastName"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+        </out-parameters>
+        <actions>
+            <script>
+                <![CDATA[ // Fetch existing record by partyId
+                 def partyRecord = ec.entity.find("partyAlias")
+                 if(context.partyId)
+                 {
+                   partyRecord.condition("partyId", context.partyId)
+                 }
+                 partyRecord = partyRecord.one()
+                 if(partyRecord)
+                 {
+                  // Update existing record partyRecord
+                  partyRecord.set("partyId", context.partyId)
+                  partyRecord.set("partyType", context.partyType)
+                  partyRecord.set("firstName", context.firstName)
+                  partyRecord.set("lastName", context.lastName)
+                  partyRecord.update()
+                  context.partyId = partyRecord.partyId
+                 }
+                 else
+                 {
+                  // Create a new record def newPartyId = ec.entity.sequencedIdPrimary("partyAlias", null, null)
+                   ec.entity.makeValue("partyAlias")
+                   .set("partyId", PartyId)
+                   .set("partyType", context.partyType)
+                   .set("firstName", context.firstName)
+                   .set("lastName", context.lastName)
+                   .create()
+                   context.partyId = newPartyId
+                 }
+               ]]>
+            </script>
+        </actions>
+    </service>
+
+    <service verb="delete" noun="PartyDelete">
+        <in-parameters>
+            <parameter name="partyId" required="true">
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="message">
+                <description>Result message</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="partyAlias" value-field="filterdata">
+                <field-map field-name="partyId" from="context.partyId"/>
+            </entity-find-one>
+
+            <if condition="filterdata != null">
+                  <then>
+                    <entity-delete value-field="filterdata"/>
+                    <set field="message" value="Party Id ${partyId} deleted successfully"/>
+                  </then>
+                <else>
+                    <set field="message" value="Please enter valid party Id this id is not present in Database"/>
+                </else>
+            </if>
+        </actions>
+    </service>
+</services>

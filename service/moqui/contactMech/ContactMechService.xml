@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+
+    <service verb="create" noun="ContactMech" type="entity-auto">
+        <in-parameters>
+            <parameter name="contactMechId" required="true"/>
+            <auto-parameters entity-name="contactMechAlias" include="nonpk"/>
+            <parameter name="partyId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <auto-parameters include="pk" required="true"/>
+        </out-parameters>
+    </service>
+
+    <service verb="find" noun="ContactMechFind">
+        <in-parameters>
+            <parameter name="contactMechId" entity-name="contactMechAlias"/>
+            <parameter name="partyId" entity-name="contactMechAlias"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="customerList" required="true"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="contactMechAlias" list="customerList">
+                <econdition field-name="contactMechId" ignore-if-empty="true"/>
+                <select-field field-name="contactMechId"/>
+                <select-field field-name="partyId"/>
+                <select-field field-name="streetAddress"/>
+                <select-field field-name="city"/>
+                <select-field field-name="state"/>
+                <select-field field-name="postalCode"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <service verb="store" noun="ContactMechCreateOrUpdate">
+        <in-parameters>
+            <parameter name="contactMechId" required="true"/>
+            <auto-parameters entity-name="contactMechAlias" include="nonpk"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="contactMechId"/>
+        </out-parameters>
+        <actions>
+            <script>
+                <![CDATA[ // Fetch existing record by contactMechId
+                 def contactMechRecord = ec.entity.find("contactMechAlias")
+                 if(context.contactMechId)
+                 {
+                   contactMechRecord.condition("contactMechId", context.contactMechId)
+                 }
+                 contactMechRecord = contactMechRecord.one()
+                 if(contactMechRecord)
+                 {
+                  // Update existing record contactMechRecord
+                  contactMechRecord.set("contactMechId", context.contactMechId)
+                  contactMechRecord.set("partyId", context.partyId)
+                  contactMechRecord.set("streetAddress", context.streetAddress)
+                  contactMechRecord.set("city", context.city)
+                  contactMechRecord.set("state", context.state)
+                  contactMechRecord.set("postalCode", context.postalCode)
+                  contactMechRecord.update()
+                  context.contactMechId = contactMechRecord.contactMechId
+                 }
+                 else
+                 {
+                  // Create a new record def newContactMechId = ec.entity.sequencedIdPrimary("contactMechAlias", null, null)
+                   ec.entity.makeValue("contactMechAlias")
+                   .set("contactMechId", contactMechId)
+                   .set("partyId", context.partyId)
+                   .set("streetAddress", context.streetAddress)
+                   .set("city", context.city)
+                   .set("state", context.state)
+                   .set("postalCode", context.postalCode)
+                   .create()
+                   context.contactMechId = newContactMechId
+                 }
+               ]]>
+            </script>
+        </actions>
+    </service>
+
+    <service verb="delete" noun="ContactMechDelete">
+        <in-parameters>
+            <parameter name="contactMechId" required="true" />
+            <parameter name="partyId" required="true" />
+        </in-parameters>
+        <out-parameters>
+            <parameter name="message">
+                <description>Result message</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="contactMechAlias" value-field="filterdata">
+                <field-map field-name="contactMechId" from="context.contactMechId"/>
+            </entity-find-one>
+
+            <if condition="filterdata != null">
+                <then>
+                    <entity-delete value-field="filterdata"/>
+                    <set field="message" value="contactMech Id ${contactMechId} deleted successfully"/>
+                </then>
+                <else>
+                    <set field="message" value="Please enter valid ContactMech Id this id is not present in Database"/>
+                </else>
+            </if>
+        </actions>
+    </service>
+</services>

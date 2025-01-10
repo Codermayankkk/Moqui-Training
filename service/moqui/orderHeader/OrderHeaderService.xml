@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+
+    <service verb="create" noun="OrderHeader" type="entity-auto">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <auto-parameters entity-name="orderHeaderAlias" include="nonpk"/>
+            <parameter name="partyId" required="true"/>
+            <parameter name="shippingContactMechId" required="true"/>
+            <parameter name="billingContactMechId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <auto-parameters include="pk" required="true"/>
+        </out-parameters>
+    </service>
+
+    <service verb="find" noun="OrderHeaderFind">
+        <in-parameters>
+            <parameter name="orderId" entity-name="orderHeaderAlias"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderList" required="true"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="orderHeaderAlias" list="orderList">
+                <econdition field-name="orderId" ignore-if-empty="true"/>
+                <select-field field-name="orderId"/>
+                <select-field field-name="orderDate"/>
+                <select-field field-name="partyId"/>
+                <select-field field-name="shippingContactMechId"/>
+                <select-field field-name="shippingContactMechId"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <service verb="store" noun="OrderHeaderCreateOrUpdate">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <auto-parameters entity-name="orderHeaderAlias" include="nonpk"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+        </out-parameters>
+        <actions>
+            <script>
+                <![CDATA[ // Fetch existing record by orderId
+                 def orderHeaderRecord = ec.entity.find("orderHeaderAlias")
+                 if(context.orderId)
+                 {
+                   orderHeaderRecord.condition("orderId", context.orderId)
+                 }
+                 orderHeaderRecord = orderHeaderRecord.one()
+                 if(orderHeaderRecord)
+                 {
+                  // Update existing record orderHeaderRecord
+                  orderHeaderRecord.set("orderId", context.orderId)
+                  orderHeaderRecord.set("orderDate", context.orderDate)
+                  orderHeaderRecord.set("partyId", context.partyId)
+                  orderHeaderRecord.set("shippingContactMechId", context.shippingContactMechId)
+                  orderHeaderRecord.set("billingContactMechId", context.billingContactMechId)
+                  orderHeaderRecord.update()
+                  context.orderId = orderHeaderRecord.orderId
+                 }
+                 else
+                 {
+                  // Create a new record def newOrderId = ec.entity.sequencedIdPrimary("orderHeaderAlias", null, null)
+                   ec.entity.makeValue("orderHeaderAlias")
+                   .set("orderId", context.orderId)
+                   .set("orderDate", context.orderDate)
+                   .set("partyId", context.partyId)
+                   .set("shippingContactMechId", context.shippingContactMechId)
+                   .set("billingContactMechId", context.billingContactMechId)
+                   .create()
+                   context.orderId = newOrderId
+                 }
+               ]]>
+            </script>
+        </actions>
+    </service>
+
+    <service verb="delete" noun="OrderHeaderDelete">
+        <in-parameters>
+            <parameter name="orderId" required="true" />
+        </in-parameters>
+        <out-parameters>
+            <parameter name="message">
+                <description>Result message</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="orderHeaderAlias" value-field="filterdata">
+                <field-map field-name="orderId" from="context.orderId"/>
+            </entity-find-one>
+
+            <if condition="filterdata != null">
+                <then>
+                    <entity-delete value-field="filterdata"/>
+                    <set field="message" value="Order Id ${orderId} deleted successfully"/>
+                </then>
+                <else>
+                    <set field="message" value="Please enter valid Order Id this id is not present in Database"/>
+                </else>
+            </if>
+        </actions>
+    </service>
+</services>

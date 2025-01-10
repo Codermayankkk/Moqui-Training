@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+
+    <service verb="create" noun="Product" type="entity-auto">
+        <in-parameters>
+            <parameter name="productId" required="true"/>
+            <auto-parameters entity-name="productAlias" include="nonpk"/>
+            <parameter name="productName" required="true"/>
+            <parameter name="color" required="true"/>
+            <parameter name="size" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <auto-parameters include="pk" required="true"/>
+        </out-parameters>
+    </service>
+
+    <service verb="find" noun="ProductFind">
+        <in-parameters>
+            <parameter name="productId" entity-name="productAlias"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="productList" required="true"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="productAlias" list="productList">
+                <econdition field-name="productId" ignore-if-empty="true"/>
+                <select-field field-name="productId"/>
+                <select-field field-name="productName"/>
+                <select-field field-name="color"/>
+                <select-field field-name="size"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <service verb="store" noun="ProductCreateOrUpdate">
+        <in-parameters>
+            <parameter name="productId" required="true"/>
+            <auto-parameters entity-name="productAlias" include="nonpk"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="productId"/>
+        </out-parameters>
+        <actions>
+            <script>
+                <![CDATA[ // Fetch existing record by productId
+                 def productRecord = ec.entity.find("productAlias")
+                 if(context.productId)
+                 {
+                   productRecord.condition("productId", context.productId)
+                 }
+                 productRecord = productRecord.one()
+                 if(productRecord)
+                 {
+                  // Update existing record productRecord
+                  productRecord.set("productId", context.productId)
+                  productRecord.set("productName", context.productName)
+                  productRecord.set("color", context.color)
+                  productRecord.update()
+                  context.productId = productRecord.productId
+                 }
+                 else
+                 {
+                  // Create a new record def newProductId = ec.entity.sequencedIdPrimary("productAlias", null, null)
+                   ec.entity.makeValue("productAlias")
+                   .set("productId", productId)
+                   .set("productName", context.productName)
+                   .set("color", context.color)
+                   .set("size", context.size)
+                   .create()
+                   context.productId = newProductId
+                 }
+               ]]>
+            </script>
+        </actions>
+    </service>
+
+    <service verb="delete" noun="ProductDelete">
+        <in-parameters>
+            <parameter name="productId" required="true" />
+        </in-parameters>
+        <out-parameters>
+            <parameter name="message">
+                <description>Result message</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="productAlias" value-field="filterdata">
+                <field-map field-name="productId" from="context.productId"/>
+            </entity-find-one>
+
+            <if condition="filterdata != null">
+                <then>
+                    <entity-delete value-field="filterdata"/>
+                    <set field="message" value="Product Id ${productId} deleted successfully"/>
+                </then>
+                <else>
+                    <set field="message" value="Please enter valid product Id this id is not present in Database"/>
+                </else>
+            </if>
+        </actions>
+    </service>
+</services>

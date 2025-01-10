@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-3.xsd">
+    <entity entity-name="OrderItem" package="moqui.training.orderItem" short-alias="orderItemAlias">
+        <field name="orderItemSeqId" type="id" is-pk="true" />
+        <field name="orderId" type="text-short" />
+        <field name="productId" type="id" />
+        <field name="quantity" type="number-integer" not-null="true" />
+        <field name="status" type="text-medium" />
+
+        <relationship type="one" related="orderHeaderAlias">
+            <key-map field-name="orderId" related="orderId"/>
+        </relationship>
+
+        <relationship type="one" related="productAlias">
+              <key-map field-name="productId" related="productId"/>
+        </relationship>
+
+    </entity>
+</entities>

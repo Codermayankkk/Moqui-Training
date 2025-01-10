@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/rest-api-3.xsd"
+          name="Parties" displayName="Order Management REST API" version="2.0.0" require-authentication="anonymous-all">
+
+      <resource name="parties">
+          <method type="post">
+              <service name="moqui.party.PartyService.create#Party"/>
+          </method>
+          <id name="partyId">
+             <method type="get">
+                 <service name="moqui.party.PartyService.find#PartyFind"/>
+             </method>
+              <method type="put">
+                  <service name="moqui.party.PartyService.store#PartyCreateOrUpdate"/>
+              </method>
+              <method type="delete">
+                  <service name="moqui.party.PartyService.delete#PartyDelete"/>
+              </method>
+
+              <resource name="contacts">
+                  <method type="post">
+                      <service name="moqui.contactMech.ContactMechService.create#ContactMech"/>
+                  </method>
+                  <method type="get">
+                      <service name="moqui.contactMech.ContactMechService.find#ContactMechFind"/>
+                  </method>
+                  <id name="contactMechId">
+                      <method type="put">
+                          <service name="moqui.contactMech.ContactMechService.store#ContactMechCreateOrUpdate"/>
+                      </method>
+                      <method type="delete">
+                          <service name="moqui.contactMech.ContactMechService.delete#ContactMechDelete"/>
+                      </method>
+                  </id>
+              </resource>
+          </id>
+      </resource>
+
+      <resource name="products">
+          <method type="post">
+              <service name="moqui.product.ProductService.create#Product"/>
+          </method>
+          <id name="productId">
+             <method type="get">
+                 <service name="moqui.product.ProductService.find#ProductFind"/>
+             </method>
+              <method type="put">
+                  <service name="moqui.product.ProductService.store#ProductCreateOrUpdate"/>
+              </method>
+              <method type="delete">
+                  <service name="moqui.product.ProductService.delete#ProductDelete"/>
+              </method>
+          </id>
+      </resource>
+    
+      <resource name="orders">
+          <method type="post">
+              <service name="moqui.orderHeader.OrderHeaderService.create#OrderHeader"/>
+          </method>
+          <id name="orderId">
+              <method type="get">
+                  <service name="moqui.orderHeader.OrderHeaderService.find#OrderHeaderFind"/>
+              </method>
+              <method type="put">
+                  <service name="moqui.orderHeader.OrderHeaderService.store#OrderHeaderCreateOrUpdate"/>
+              </method>
+              <method type="delete">
+                  <service name="moqui.orderHeader.OrderHeaderService.delete#OrderHeaderDelete"/>
+              </method>
+              <resource name="items">
+                  <method type="post">
+                      <service name="moqui.orderItem.OrderItemService.create#OrderItem"/>
+                  </method>
+              </resource>
+          </id>
+      </resource>
+</resource>

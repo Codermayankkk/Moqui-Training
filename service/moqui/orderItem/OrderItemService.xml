@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+
+    <service verb="create" noun="OrderItem" type="entity-auto">
+        <in-parameters>
+            <parameter name="orderItemSeqId" required="true"/>
+            <auto-parameters entity-name="orderItemAlias" include="nonpk"/>
+            <parameter name="orderId" required="true"/>
+            <parameter name="productId" required="true"/>
+            <parameter name="quantity" required="true"/>
+            <parameter name="status" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <auto-parameters include="pk" required="true"/>
+        </out-parameters>
+    </service>
+
+    <service verb="find" noun="OrderItemFind">
+        <in-parameters>
+            <parameter name="orderItemSeqId" entity-name="orderItemAlias"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderItemList" required="true"/>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="orderItemAlias" list="orderItemList">
+                <econdition field-name="orderItemSeqId" ignore-if-empty="true"/>
+                <select-field field-name="orderItemSeqId"/>
+                <select-field field-name="orderDate"/>
+                <select-field field-name="partyId"/>
+                <select-field field-name="shippingContactMechId"/>
+                <select-field field-name="shippingContactMechId"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <service verb="store" noun="OrderItemCreateOrUpdate">
+        <in-parameters>
+            <parameter name="orderItemSeqId" required="true"/>
+            <auto-parameters entity-name="orderItemAlias" include="nonpk"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderItemSeqId"/>
+        </out-parameters>
+        <actions>
+            <script>
+                <![CDATA[ // Fetch existing record by orderId
+                 def orderItemRecord = ec.entity.find("orderItemAlias")
+                 if(context.orderId)
+                 {
+                   orderItemRecord.condition("orderItemSeqId", context.orderItemSeqId)
+                 }
+                 orderItemRecord = orderItemRecord.one()
+                 if(orderItemRecord)
+                 {
+                  // Update existing record orderItemRecord
+                  orderItemRecord.set("orderItemSeqId", context.orderItemSeqId)
+                  orderItemRecord.set("orderId", context.orderId)
+                  orderItemRecord.set("productId", context.productId)
+                  orderItemRecord.set("quantity", context.quantity)
+                  orderItemRecord.set("status", context.status)
+                  orderItemRecord.update()
+                  context.orderItemSeqId = orderItemRecord.orderItemSeqId
+                 }
+                 else
+                 {
+                  // Create a new record def newOrderItemSeqId = ec.entity.sequencedIdPrimary("orderItemAlias", null, null)
+                   ec.entity.makeValue("orderItemAlias")
+                   .set("orderId", context.orderId)
+                   .set("productId", context.productId)
+                   .set("quantity", context.quantity)
+                   .set("status", context.status)
+                   .create()
+                   context.orderItemSeqId = newOrderItemSeqId
+                 }
+               ]]>
+            </script>
+        </actions>
+    </service>
+
+    <service verb="delete" noun="OrderItemDelete">
+        <in-parameters>
+            <parameter name="orderItemSeqId" required="true" />
+        </in-parameters>
+        <out-parameters>
+            <parameter name="message">
+                <description>Result message</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="orderItemAlias" value-field="filterdata">
+                <field-map field-name="orderItemSeqId" from="context.orderItemSeqId"/>
+            </entity-find-one>
+
+            <if condition="filterdata != null">
+                <then>
+                    <entity-delete value-field="filterdata"/>
+                    <set field="message" value="OrderItem Id ${orderItemSeqId} deleted successfully"/>
+                </then>
+                <else>
+                    <set field="message" value="Please enter valid OrderItemSeqId this id is not present in Database"/>
+                </else>
+            </if>
+        </actions>
+    </service>
+</services>

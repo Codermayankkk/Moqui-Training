@@ -29,7 +29,7 @@
 <!--        </service>-->
 <!--       -->
 <!--    service through script-->
-        <service verb="create" noun="MoquiTraining" type="script" location="component://Moqui-Training/scripts/GroovyService.groovy">
+        <service verb="create" noun="MoquiTrainingCreate" type="script" location="component://Moqui-Training/scripts/GroovyService.groovy">
             <in-parameters>
                 <auto-parameters entity-name="moqui.training.MoquiTraining" include="nonpk"/>
                 <parameter name="trainingName" required="true"/>
@@ -40,7 +40,7 @@
             </out-parameters>
         </service>
 
-        <service verb="find" noun="MoquiTraining">
+        <service verb="find" noun="MoquiTrainingFind">
             <in-parameters>
                 <parameter name="trainingName" entity-name="moqui.training.MoquiTraining"/>
                 <parameter name="trainingId" entity-name="moqui.training.MoquiTraining"/>
@@ -64,7 +64,7 @@
             </actions>
         </service>
 
-    <service verb="store" noun="MoquiTraining">
+    <service verb="store" noun="MoquiTrainingCreateOrUpdate">
         <in-parameters>
             <parameter name="trainingId" required="true"/>
             <parameter name="trainingName" required="true"/>
@@ -115,7 +115,7 @@
         </actions>
     </service>
 
-        <service verb="delete" noun="MoquiTraining">
+        <service verb="delete" noun="MoquiTrainingDelete">
             <in-parameters>
                 <parameter name="trainingId" required="true">
                 </parameter>

@@ -1,1 +1,8 @@
-<component name="Moqui-Training" location="/component/moqui-training"/>
+<moqui-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-3.xsd">
+<!--    <database-list>-->
+<!--        <dictionary-type type="id" java-type="java.lang.String" default-sql-type="VARCHAR(20)"/>-->
+<!--        <dictionary-type type="text-medium" java-type="java.lang.String" default-sql-type="VARCHAR(100)"/>-->
+<!--        <dictionary-type type="text-intermediate" java-type="java.lang.String" default-sql-type="VARCHAR(1023)"/>-->
+<!--        <dictionary-type type="text-long" java-type="java.lang.String" default-sql-type="VARCHAR(4095)"/>-->
+<!--    </database-list>-->
+</moqui-conf>
